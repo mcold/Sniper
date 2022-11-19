@@ -1,9 +1,10 @@
 # coding: utf-8
+import xml.etree.ElementTree as ET
+from pathlib import Path
 from db import Category, Task
 from db import get_snips, get_categories, get_task
-import xml.etree.ElementTree as ET
 
-file_snips = 'UserSnippets.xml'
+file_snips = str(Path.home()) + r'\AppData\Roaming\SQL Developer\UserSnippets.xml'
 xml_start = "<?xml version = '1.0' encoding = 'UTF-8'?>\n"
 
 def get_xml_task_snips(task: Task) -> str:
@@ -11,7 +12,7 @@ def get_xml_task_snips(task: Task) -> str:
     for cat in get_categories(task = task):
         category = ET.SubElement(root, 'group', {'category': cat.name, 'language': 'PLSQL'})
         for snip in get_snips(cat = cat):
-            snippet = ET.SubElement(category, 'snippet', {'name': snip.name, 'description': snip.descript})
+            snippet = ET.SubElement(category, 'snippet', {'name': str(snip.seq_order) + ' ' + snip.name, 'description': snip.descript})
             code = ET.SubElement(snippet, 'code')
             code.text = snip.code.replace('\n', '')
     ET.indent(root)
@@ -23,7 +24,7 @@ def get_xml_cat_snips(cat: Category) -> str:
     for snip in get_snips(cat = cat):
         snip = ET.SubElement(category, 'snippet', {'name': snip.name, 'description': snip.descript})
         code = ET.SubElement(snip, 'code')
-        code.text = snip.code
+        code.text = '\n' + snip.code
     ET.indent(root)
     return ET.tostring(root).decode('utf-8').replace('&lt;', '<').replace('&gt;', '>')
 

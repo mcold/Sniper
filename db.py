@@ -22,19 +22,22 @@ class Category:
     id = 0
     id_task = 0
     name = ''
+    tag = ''
     descript = ''
 
     def __init__(self, t: tuple):
         self.id = t[0]
         self.id_task = t[1]
         self.name = t[2]
-        self.descript = t[3]
+        self.tag = t[3]
+        self.descript = t[4]
 
 class Snip:
     id = 0
     id_cat = 0
     name = ''
     install = 0
+    seq_order = 0
     code = ''
     roll_back = ''
     descript = ''
@@ -44,9 +47,10 @@ class Snip:
         self.id_cat = t[1]
         self.name = t[2]
         self.install = t[3]
-        self.code = t[4]
-        self.roll_back = t[5]
-        self.descript = t[6]
+        self.seq_order = t[4]
+        self.code = t[5]
+        self.roll_back = t[6]
+        self.descript = t[7]
 
 def get_task(id: int) -> Task:
     with sqlite3.connect(db) as conn:
@@ -82,6 +86,7 @@ def get_categories(task: Task) -> list:
                         select id,
                                id_task,
                                name,
+                               tag,
                                descript
                         from category
                         where id_task = {id_task};
@@ -97,11 +102,13 @@ def get_snips(cat: Category) -> list:
                                id_cat,
                                name,
                                install,
+                               seq_order,
                                code,
                                roll_back,
                                descript
                           from snip
-                         where id_cat = {id_cat};
+                         where id_cat = {id_cat}
+                         order by seq_order asc;
                     """.format(id_cat = cat.id))
     
     return [Snip(result) for result in cur.fetchall()]
