@@ -14,6 +14,9 @@ class Task:
         self.num = t[1]
         self.name = t[2]
         self.descript = t[3]
+    
+    def __str__(self) -> str:
+        return '{id}: {num}: {name}: {descript}'.format(id = self.id, num = self.num, name = self.name, descript = self.descript)
 
 class Category:
     id = 0
@@ -44,6 +47,20 @@ class Snip:
         self.code = t[4]
         self.roll_back = t[5]
         self.descript = t[6]
+
+def get_task(id: int) -> Task:
+    with sqlite3.connect(db) as conn:
+        cur = conn.cursor()
+        cur.execute("""
+                    select id,
+                           num,
+                           name,
+                           descript
+                      from task
+                      where id = {id_task}
+                      order by num;
+                    """.format(id_task = id))
+    return Task(cur.fetchone())
 
 def get_tasks() -> list:
     with sqlite3.connect(db) as conn:
