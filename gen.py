@@ -2,7 +2,7 @@
 import xml.etree.ElementTree as ET
 from pathlib import Path
 from db import Category, Task
-from db import get_snips, get_categories, get_task
+from db import get_snips, get_categories, get_task, get_all_categories
 
 file_snips = str(Path.home()) + r'\AppData\Roaming\SQL Developer\UserSnippets.xml'
 xml_start = "<?xml version = '1.0' encoding = 'UTF-8'?>\n"
@@ -36,6 +36,20 @@ def gen_xml_task_snips(task: Task) -> None:
 
 def gen_xml_user_snips(id_task: int) -> None:
     gen_xml_task_snips(task = get_task(id = id_task))
+
+def get_db_snips() -> ET.Element:
+    root = ET.Element('snippets')
+    for cat in get_all_categories():
+        category = ET.SubElement(root, 'group', {'category': cat.name, 'language': 'PLSQL'})
+        for snip in get_snips(cat = cat):
+            snippet = ET.SubElement(category, 'snippet', {'name': str(snip.seq_order) + ' ' + snip.name, 'description': snip.descript})
+            code = ET.SubElement(snippet, 'code')
+            code.text = snip.code.replace('\n', '')
+    ET.indent(root)
+    return root
+
+def sync_snips() -> None:
+    root = ET.Element('snippets')
 
 
 if __name__ == "__main__":
