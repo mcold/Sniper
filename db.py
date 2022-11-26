@@ -14,7 +14,10 @@ class Task:
         self.num = t[1]
         self.name = t[2]
         self.descript = t[3]
-        self.cats = t[4]
+        if len(t) > 4:
+            self.cats = t[4]
+        else:
+            self.cats = get_categories(task = self)            
     
     def __str__(self) -> str:
         return '{id}: {num}: {name}: {descript}'.format(id = self.id, num = self.num, name = self.name, descript = self.descript)
@@ -33,7 +36,10 @@ class Category:
         self.name = t[2]
         self.tag = t[3]
         self.descript = t[4]
-        self.snips = t[5]
+        if len(t) > 5:
+            self.snips = t[5]
+        else:
+            self.snips = get_snips(cat = self)
     
     def __eq__(self, other):
         return self.name == other.name
@@ -76,7 +82,7 @@ def get_task(id: int) -> Task:
                       where id = {id_task}
                       order by num;
                     """.format(id_task = id))
-    return Task([*cur.fetchone(), []])
+    return Task(cur.fetchone())
 
 def get_tasks() -> list:
     with sqlite3.connect(db) as conn:
@@ -103,7 +109,7 @@ def get_categories(task: Task) -> list:
                         from category
                         where id_task = {id_task};
                     """.format(id_task = task.id))
-    return [Category([*result, []]) for result in cur.fetchall()]
+    return [Category(result) for result in cur.fetchall()]
 
 def get_all_categories() -> list:
     with sqlite3.connect(db) as conn:
@@ -117,7 +123,7 @@ def get_all_categories() -> list:
                         from category;
                     """)
 
-    return [Category([*result, []]) for result in cur.fetchall()]
+    return [Category(result) for result in cur.fetchall()]
 
 def get_snips(cat: Category) -> list:
     with sqlite3.connect(db) as conn:

@@ -9,12 +9,12 @@ xml_start = "<?xml version = '1.0' encoding = 'UTF-8'?>\n"
 
 def get_xml_task_snips(task: Task) -> str:
     root = ET.Element('snippets')
-    for cat in get_categories(task = task):
+    for cat in task.cats:
         category = ET.SubElement(root, 'group', {'category': cat.name, 'language': 'PLSQL'})
-        for snip in get_snips(cat = cat):
-            snippet = ET.SubElement(category, 'snippet', {'name': str(snip.seq_order) + ' ' + snip.name, 'description': snip.descript})
+        for snip in cat.snips:
+            snippet = ET.SubElement(category, 'snippet', {'name': snip.name, 'description': snip.descript})
             code = ET.SubElement(snippet, 'code')
-            code.text = snip.code
+            code.text = '\n{code}\n'.format(code=snip.code.replace('\r\n', '\n').strip())
     ET.indent(root)
     return ET.tostring(root).decode('utf-8').replace('&lt;', '<').replace('&gt;', '>')
 
@@ -41,8 +41,8 @@ def get_db_snips() -> ET.Element:
     root = ET.Element('snippets')
     for cat in get_all_categories():
         category = ET.SubElement(root, 'group', {'category': cat.name, 'language': 'PLSQL'})
-        for snip in get_snips(cat = cat):
-            snippet = ET.SubElement(category, 'snippet', {'name': str(snip.seq_order) + ' ' + snip.name, 'description': snip.descript})
+        for snip in cat.snips:
+            snippet = ET.SubElement(category, 'snippet', {'name': snip.name, 'description': snip.descript})
             code = ET.SubElement(snippet, 'code')
             code.text = snip.code.replace('\n', '')
     ET.indent(root)
@@ -51,7 +51,7 @@ def get_db_snips() -> ET.Element:
 def sync_snips() -> None:
     root = ET.Element('snippets')
 
-def get_xml_task_snips(l_cat: list) -> str:
+def get_xml_task_cat_snips(l_cat: list) -> str:
     root = ET.Element('snippets')
     for cat in l_cat:
         category = ET.SubElement(root, 'group', {'category': cat.name, 'language': 'PLSQL'})
@@ -87,7 +87,7 @@ def get_xml_cat_tree(file: str) -> str:
     return l_cat
 
 def regen_xml_snips(file: str):
-    res = get_xml_task_snips(l_cat=get_xml_cat_tree(file=file))
+    res = get_xml_task_cat_snips(l_cat=get_xml_cat_tree(file=file))
     with open(file_snips, 'w') as f: f.write(xml_start + res)
 
 if __name__ == "__main__":
