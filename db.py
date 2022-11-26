@@ -38,7 +38,7 @@ class Category:
     def __eq__(self, other):
         return self.name == other.name
 
-    def __str__(self):
+    def __str__(self) -> str:
         return '{id}: {name} {descript}'.format(id=self.id, name=self.name, descript=self.descript)
 
 class Snip:
@@ -60,6 +60,9 @@ class Snip:
         self.code = t[5]
         self.roll_back = t[6]
         self.descript = t[7]
+
+    def __str__(self) -> str:
+        return '{id}: {name}'.format(id=self.id, name=self.name)
 
 def get_task(id: int) -> Task:
     with sqlite3.connect(db) as conn:
