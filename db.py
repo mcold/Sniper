@@ -44,9 +44,17 @@ class Category:
     def __eq__(self, other):
         return self.name == other.name
 
+    def __import_snips__(self, other):
+        s_self_snip = set(x.name for x in self.snips)
+        s_other_snip = set(x.name for x in other.snips)
+        d_other_snip = dict(zip([snip.name for snip in other.snips], other.snips))
+        for snip in set.difference(s_other_snip, s_self_snip): self.snips.append(d_other_snip[snip])
+        self.snips.sort(key=lambda x: x.name, reverse=False)
+        return self
+
     def __str__(self) -> str:
         return '{id}: {name} {descript}'.format(id=self.id, name=self.name, descript=self.descript)
-
+        
 class Snip:
     id = 0
     id_cat = 0
@@ -63,9 +71,12 @@ class Snip:
         self.name = t[2]
         self.install = t[3]
         self.seq_order = t[4]
-        self.code = t[5]
+        self.code = t[5].replace('\r\n', '\n').strip()
         self.roll_back = t[6]
         self.descript = t[7]
+
+    def __eq__(self, other):
+            return self.name == other.name
 
     def __str__(self) -> str:
         return '{id}: {name}'.format(id=self.id, name=self.name)
